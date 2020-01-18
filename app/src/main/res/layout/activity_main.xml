@@ -47,18 +47,19 @@ tools:context=".MainActivity">
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/delLine" />
 
-<Button
-    android:id="@+id/MorphBtn"
-    android:layout_width="144dp"
-    android:layout_height="48dp"
-    android:layout_marginTop="2dp"
-    android:layout_marginEnd="44dp"
-    android:layout_marginRight="44dp"
-    android:layout_marginBottom="76dp"
-    android:text="Morph"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/editText" />
+    <Button
+        android:id="@+id/MorphBtn"
+        android:layout_width="144dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginRight="44dp"
+        android:layout_marginBottom="76dp"
+        android:onClick="beginMorph"
+        android:text="Morph"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
 
 <EditText
     android:id="@+id/editText"
@@ -80,16 +81,17 @@ tools:context=".MainActivity">
     app:layout_constraintStart_toEndOf="@+id/secondImage"
     app:layout_constraintTop_toBottomOf="@+id/clearLinesBtn" />
 
-<Button
-    android:id="@+id/delLine"
-    android:layout_width="144dp"
-    android:layout_height="48dp"
-    android:layout_marginTop="93dp"
-    android:layout_marginEnd="44dp"
-    android:layout_marginRight="44dp"
-    android:layout_marginBottom="9dp"
-    android:text="Delete Line"
-    app:layout_constraintBottom_toTopOf="@+id/clearLinesBtn"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/delLine"
+        android:layout_width="144dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="93dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginRight="44dp"
+        android:layout_marginBottom="9dp"
+        android:onClick="deleteLastTouched"
+        android:text="Delete Line"
+        app:layout_constraintBottom_toTopOf="@+id/clearLinesBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
