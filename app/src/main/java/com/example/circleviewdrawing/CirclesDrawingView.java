@@ -13,10 +13,8 @@ import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -27,27 +25,8 @@ public class CirclesDrawingView extends View {
 
     /** Main bitmap */
     private Bitmap mBitmap = null;
-    private Bitmap mBitmap2 = null;
 
     private Rect mMeasuredRect;
-
-    /** Stores data about single circle */
-    private static class CircleArea {
-        int radius;
-        int centerX;
-        int centerY;
-
-        CircleArea(int centerX, int centerY, int radius) {
-            this.radius = radius;
-            this.centerX = centerX;
-            this.centerY = centerY;
-        }
-
-        @Override
-        public String toString() {
-            return "Circle[" + centerX + ", " + centerY + ", " + radius + "]";
-        }
-    }
 
     /** Paint to draw circles */
     private Paint mCirclePaint;
@@ -60,7 +39,7 @@ public class CirclesDrawingView extends View {
     private static final int CIRCLES_LIMIT = 10;
 
     /** All available circles */
-    private ArrayList<ArrayList<CircleArea>> mCircles = new ArrayList<ArrayList<CircleArea>>();
+    private ArrayList<Line> lines = new ArrayList<Line>();
     private SparseArray<CircleArea> mCirclePointer = new SparseArray<CircleArea>();
 
     private CircleArea lastTouched = new CircleArea(0,0,0);
@@ -106,12 +85,12 @@ public class CirclesDrawingView extends View {
     public void onDraw(final Canvas canv) {
         // background bitmap to cover all area
         canv.drawBitmap(mBitmap, null, mMeasuredRect, null);
-        for (ArrayList<CircleArea> circleList : mCircles){
-            CircleArea c1 = circleList.get(0);
-            if(circleList.size() == 1){
+        for (Line line : lines){
+            CircleArea c1 = line.getStart();
+            if(line.getEnd() == null){
                 canv.drawCircle(c1.centerX, c1.centerY, c1.radius, c1.centerX == lastTouched.centerX ? selectedMCirclePaint : mCirclePaint);
             } else {
-                CircleArea c2 = circleList.get(1);
+                CircleArea c2 = line.getEnd();
                 if(c1.centerX == lastTouched.centerX || c2.centerX == lastTouched.centerX){
                     canv.drawCircle(c1.centerX, c1.centerY, c1.radius, selectedMCirclePaint);
                     canv.drawCircle(c2.centerX, c2.centerY, c2.radius, selectedMCirclePaint);
@@ -152,21 +131,21 @@ public class CirclesDrawingView extends View {
     }
 
     public void deleteLastTouched(){
-        Iterator<ArrayList<CircleArea>> i = mCircles.iterator();
+        Iterator<Line> i = lines.iterator();
         while (i.hasNext()) {
-            List<CircleArea> circleList = i.next(); // must be called before you can call i.remove()
-            CircleArea c1 = circleList.get(0);
-            if(circleList.size() == 1 && c1.centerX == lastTouched.centerX){
+            Line line = i.next(); // must be called before you can call i.remove()
+            CircleArea c1 = line.getStart();
+            if(line.getEnd() == null && c1.centerX == lastTouched.centerX){
                 i.remove();
             } else {
-                CircleArea c2 = circleList.get(1);
+                CircleArea c2 = line.getEnd();
                 if(c1.centerX == lastTouched.centerX || c2.centerX == lastTouched.centerX){
                     i.remove();
                 }
             }
         }
 
-//        for (List<CircleArea> circleList : mCircles){
+//        for (List<CircleArea> circleList : lines){
 //            CircleArea c1 = circleList.get(0);
 //            if(circleList.size() == 1 && c1.centerX == lastTouched.centerX){
 //
@@ -323,19 +302,17 @@ public class CirclesDrawingView extends View {
     public CircleArea createCircleCopy(final int xTouch, final int yTouch){
         CircleArea touchedCircle = new CircleArea(xTouch, yTouch, RADIUS_LIMIT);
         //Log.w(TAG, "Added circle " + touchedCircle);
-        if (mCircles.size() > 0){
-            ArrayList<CircleArea> latestList = mCircles.get(mCircles.size() - 1);
-            if (latestList.size() < 2) {
-                latestList.add(touchedCircle);
+        if (lines.size() > 0){
+            Line latestLine = lines.get(lines.size() - 1);
+            if (latestLine.getEnd() == null) {
+                latestLine.setEnd(touchedCircle);
             } else {
-                ArrayList<CircleArea> newList = new ArrayList<CircleArea>();
-                newList.add(touchedCircle);
-                mCircles.add(newList);
+                Line newLine = new Line(touchedCircle);
+                lines.add(newLine);
             }
         } else {
-            ArrayList<CircleArea> newList = new ArrayList<CircleArea>();
-            newList.add(touchedCircle);
-            mCircles.add(newList);
+            Line newLine = new Line(touchedCircle);
+            lines.add(newLine);
         }
         return touchedCircle;
     }
@@ -351,14 +328,14 @@ public class CirclesDrawingView extends View {
     private CircleArea getTouchedCircle(final int xTouch, final int yTouch) {
         CircleArea touched = null;
 
-        for (List<CircleArea> circleList : mCircles) {
-            CircleArea c1 = circleList.get(0);
+        for (Line line : lines) {
+            CircleArea c1 = line.getStart();
             if ((c1.centerX - xTouch) * (c1.centerX - xTouch) + (c1.centerY - yTouch) * (c1.centerY - yTouch) <= c1.radius * c1.radius) {
                 touched = c1;
                 break;
             }
-            if(circleList.size() == 2){
-                CircleArea c2 = circleList.get(1);
+            if(line.getEnd() != null){
+                CircleArea c2 = line.getEnd();
                 if ((c2.centerX - xTouch) * (c2.centerX - xTouch) + (c2.centerY - yTouch) * (c2.centerY - yTouch) <= c2.radius * c2.radius) {
                     touched = c2;
                     break;
@@ -376,9 +353,51 @@ public class CirclesDrawingView extends View {
     }
 
     public void clearLines(){
-        //Log.w(TAG, "Clear all circles, size is " + mCircles.size());
+        //Log.w(TAG, "Clear all circles, size is " + lines.size());
         // remove first circle
-        mCircles.clear();
+        lines.clear();
         invalidate();
     }
+
+
+    public Bitmap getmBitmap() {
+        return mBitmap;
+    }
+
+    public void setmBitmap(Bitmap mBitmap) {
+        this.mBitmap = mBitmap;
+    }
+
+    public Rect getmMeasuredRect() {
+        return mMeasuredRect;
+    }
+
+    public void setmMeasuredRect(Rect mMeasuredRect) {
+        this.mMeasuredRect = mMeasuredRect;
+    }
+
+    public ArrayList<Line> getlines() {
+        return lines;
+    }
+
+    public void setlines(ArrayList<Line>  lines) {
+        this.lines = lines;
+    }
+
+    public SparseArray<CircleArea> getmCirclePointer() {
+        return mCirclePointer;
+    }
+
+    public void setmCirclePointer(SparseArray<CircleArea> mCirclePointer) {
+        this.mCirclePointer = mCirclePointer;
+    }
+
+    public CircleArea getLastTouched() {
+        return lastTouched;
+    }
+
+    public void setLastTouched(CircleArea lastTouched) {
+        this.lastTouched = lastTouched;
+    }
+
 }
