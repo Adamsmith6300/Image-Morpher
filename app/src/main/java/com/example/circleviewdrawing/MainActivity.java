@@ -1,14 +1,26 @@
 package com.example.circleviewdrawing;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -26,156 +38,281 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        verifyStoragePermissions(this);
+
         firstImg = findViewById(R.id.firstImage);
         secondImg = findViewById(R.id.secondImage);
 
-//        firstImg.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                    Log.i("CHANGEFOCUS",v.toString());
-//                if(!hasFocus){
+//        Line srcL = new Line(new CircleArea(1,40,1), new CircleArea(5,1,1));
+//        Line dstL = new Line(new CircleArea(5,16,1), new CircleArea(1,20,1));
+//        Line srcL2 = new Line(new CircleArea(8,1,1), new CircleArea(40,40,1));
+//        Line dstL2 = new Line(new CircleArea(5,30,1), new CircleArea(15,35,1));
+//        ArrayList<Line> srcLines = new ArrayList<>(1);
+//        srcLines.add(srcL);
+//        srcLines.add(srcL2);
+//        ArrayList<Line> dstLines = new ArrayList<>(1);
+//        dstLines.add(dstL);
+//        dstLines.add(dstL2);
 //
-//                }
-//            }
-//        });
-//        secondImg.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                    Log.i("CHANGEFOCUS",v.toString());
-//                if(!hasFocus){
-//                  //  v.resetLastTouched();
-//                }
-//            }
-//        });
+//        double p = 0,a = 0.01f,b = 1.0f;
+//        Vector2d src = new Vector2d();
+//        src = warp(10,10,srcLines , dstLines, p, a, b, src);
 
     }
 
-//    public void deleteLine(android.view.View v){
-//        (CirclesDrawingView) v.deleteLastTouched();
-//    }
-
     public void beginMorph(android.view.View view){
-        int w = secondImg.getmBitmap().getWidth(), h = secondImg.getmBitmap().getHeight();
-        ArrayList<Line> srcLines = secondImg.getlines();
+        int w = secondImg.getmBitmap().getWidth();
+        int h = secondImg.getmBitmap().getHeight();
+        ArrayList<Line> srcLines = firstImg.getlines();
+        ArrayList<Line> dstLines = secondImg.getlines();
         int numberOfLines = srcLines.size();
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
 
-
         //create list of frames
         outputFrames = new ArrayList<Frame>(numberOfFrames);
+
         //setup lines for each frame
         for(int i = 0; i < numberOfFrames;++i){
+
             Bitmap bmp = Bitmap.createBitmap(w, h, conf);
-            Frame newFrame = new Frame(bmp,numberOfLines);
+//            TO REMOVE:
+            Bitmap firstImgBmp = firstImg.getmBitmap();
+            Frame newFrame = new Frame(firstImgBmp,numberOfLines, firstImg.getlines());
+            Bitmap newbmp = Bitmap.createBitmap(w, h, conf);
+
+            int [] pixels = new int[w * h];
+            firstImgBmp.getPixels(pixels, 0, w, 0, 0, w, h);
+
             //calc each line by interpolation
-            for(int j = 0; j < numberOfLines;++j){
-                Line srcLine = firstImg.getlines().get(j);
-                Line dstLine = srcLines.get(j);
+            //newFrame.genLines(firstImg, secondImg, numberOfLines, numberOfFrames, i);
+            Vector2d src = new Vector2d(), dest = new Vector2d();
 
-                //first point
-                int firstDiffX = dstLine.getStart().centerX - srcLine.getStart().centerX;
-                int firstDiffY = dstLine.getStart().centerY - srcLine.getStart().centerY;
-                int fframeStepX = firstDiffX/(numberOfFrames+1);
-                int fframeStepY = firstDiffY/(numberOfFrames+1);
-                int firstPtX = srcLine.getStart().centerX + ((i+1)*fframeStepX);
-                int firstPtY = srcLine.getStart().centerY + ((i+1)*fframeStepY);
-                CircleArea start = new CircleArea(firstPtX, firstPtY, 1);
+            Log.i("srcLines",newFrame.getLines().toString());
+            Log.i("dstLines",dstLines.toString());
 
-                //second point
-                int secondDiffX = dstLine.getEnd().centerX - srcLine.getEnd().centerX;
-                int secondDiffY = dstLine.getEnd().centerY - srcLine.getEnd().centerY;
-                int frameStepX = secondDiffX/(numberOfFrames+1);
-                int frameStepY = secondDiffY/(numberOfFrames+1);
-                int secondPtX = srcLine.getEnd().centerX + ((i+1)*frameStepX);
-                int secondPtY = srcLine.getEnd().centerY + ((i+1)*frameStepY);
-                CircleArea end = new CircleArea(secondPtX, secondPtY, 1);
-
-                //make vector
-                Line newLine = new Line(start, end);
-//                Log.i("src:","\n"+srcLine.toString());
-//                Log.i("dst:",dstLine.toString());
-//                Log.i("intermediate:",newLine.toString());
-                //add vector to frame class lines
-                newFrame.addLine(newLine);
-            }
-
-
-            Vector2d dest = new Vector2d(), src = new Vector2d();
             //calc position of each new pixel
             for(int x = 0; x < w; ++x){
                 for(int y = 0; y < h;++y){
-                    double interLength, srcLength;
-                    double weight, weightSum, dist;
-                    double sum_x, sum_y;
-                    double u, v;
-                    Vector2d pd = new Vector2d(), pq = new Vector2d(), qd = new Vector2d();
-                    double X, Y;
+
                     double p = 0,a = 0.01f,b = 2.0f;
-                    sum_x = 0;
-                    sum_y = 0;
-                    weightSum = 0;
+                    src = warp(x,y, newFrame.getLines(), dstLines, p, a, b, src);
+                    //dest = warp(x,y, newFrame.getLines(), dstLines, p, a, b, dest);
 
-                    for(int k = 0; k < srcLines.size(); ++k){
+                    if (src.getX() < 0)
+                        src.setX(0);
+                    if (src.getX() > w-1)
+                        src.setX(w - 1);
+                    if (src.getY() < 0)
+                        src.setY(0);
+                    if (src.getY() > h-1)
+                        src.setY(h - 1);
+//                    if (dest.getX() < 0)
+//                        dest.setX(0);
+//                    if (dest.getX() > w-1)
+//                        dest.setX(w - 1);
+//                    if (dest.getY() < 0)
+//                        dest.setY(0);
+//                    if (dest.getY() > h-1)
+//                        dest.setY(h-1);
 
-                        pd.setX(x - newFrame.getLines().get(k).getStart().centerX);
-                        pd.setY(y - newFrame.getLines().get(k).getStart().centerY);
+                    //all blue working
+                    //pixels[(w*y)+x] = firstImgBmp.getPixel((int)src.getX(),(int)src.getY());
+                    pixels[(w*y)+x] = firstImgBmp.getPixel((int)src.getX(),(int)src.getY());
 
-                        pq.setX(newFrame.getLines().get(k).getEnd().centerX - newFrame.getLines().get(k).getStart().centerX);
-                        pq.setY(newFrame.getLines().get(k).getEnd().centerY - newFrame.getLines().get(k).getStart().centerY);
-
-                        interLength = pq.getX() * pq.getX() + pq.getY() * pq.getY();
-                        u = (pd.getX() * pq.getX() + pd.getY() * pq.getY()) / interLength;
-
-                        interLength = Math.sqrt(interLength);
-                        v = (pd.getX() * pq.getY() - pd.getY() * pq.getX());
-
-                        pq.setX(srcLines.get(k).getEnd().centerX - srcLines.get(k).getStart().centerX);
-                        pq.setY(srcLines.get(k).getEnd().centerY - srcLines.get(k).getStart().centerY);
-
-                        srcLength = Math.sqrt(pq.getX() * pq.getX() + pq.getY() * pq.getY());
-                        X = srcLines.get(k).getStart().centerX + u * pq.getX() + v * pq.getY() / srcLength;
-                        Y = srcLines.get(k).getStart().centerY + u * pq.getY() - v * pq.getX() / srcLength;
-
-                        if (u < 0)
-                            dist = Math.sqrt(pd.getX() * pd.getX() + pd.getY() * pd.getY());
-                        else if (u > 1) {
-                            qd.setX(x - newFrame.getLines().get(k).getEnd().centerX);
-                            qd.setY(y - newFrame.getLines().get(k).getEnd().centerY);
-                            dist = Math.sqrt(qd.getX() * qd.getX() + qd.getY() * qd.getY());
-                        }else{
-                            dist = Math.abs(v);
-                        }
+                    //Log.i("src",src.getX()+"--"+src.getY());
 
 
-                        weight = Math.pow(Math.pow(interLength, p) / (a + dist), b);
-                        sum_x += X * weight;
-                        sum_y += Y * weight;
-                        weightSum += weight;
-                    }
-                    src.setX(sum_x / weightSum);
-                    src.setY(sum_y / weightSum);
+                    //newFrame.movePixel(x,y,src);
+                    //newFrame.interpolateColour(src, dest, (i+1)/(numberOfFrames+1), firstImg.getmBitmap(), secondImg.getmBitmap());
 
                 }
+            }
+            newbmp.setPixels(pixels, 0, w, 0, 0, w, h);
+            secondImg.setmBitmap(newbmp);
 
+            try {
+                String path =  Environment.getExternalStorageDirectory().getAbsolutePath();
+                OutputStream fOut = null;
+                Integer counter = 5;
+                Log.i("OUTPUT", path);
+                File file = new File(path, "cat"+i+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+                fOut = new FileOutputStream(file);
 
+                //Bitmap pictureBitmap = newFrame.getNewBmp().copy(Bitmap.Config.ARGB_8888, true); // obtaining the Bitmap
+                newbmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+                fOut.flush(); // Not really required
+                fOut.close(); // do not forget to close the stream
 
+                MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
 
 
-            outputFrames.add(newFrame);
+
+//            secondImg.setmBitmap(newFrame.getBmp());
+//            outputFrames.add(newFrame);
         }
 
     }
 
-    public double calcU(int x, int y,Frame newFrame){
-        double u = 0.0f;
+    public Vector2d warp(int x, int y, ArrayList<Line> interLines, ArrayList<Line> srcLines, double p, double a, double b, Vector2d src){
 
-        return u;
+        double normAbs, interLen,interLenAbs, srcLength;
+        double weight, weightSum, dist, d;
+        double sum_x, sum_y;
+        double flen, f;
+        Vector2d pd = new Vector2d(), dp = new Vector2d(), pq = new Vector2d(), qd = new Vector2d(), norm = new Vector2d(), nrmonrm = new Vector2d();
+        double X, Y;
+        sum_x = 0;
+        sum_y = 0;
+        weightSum = 0;
+
+
+        for(int k = 0; k < interLines.size(); ++k){
+//            Log.i("DST:","PART ONE");
+            pd.setX(srcLines.get(k).getStart().centerX - x);
+            pd.setY(srcLines.get(k).getStart().centerY - y);
+//            Log.i("TP1", pd.getX()+","+pd.getY());
+
+            dp.setX(x - srcLines.get(k).getStart().centerX);
+            dp.setY(y - srcLines.get(k).getStart().centerY);
+//            Log.i("P1T", dp.getX()+","+dp.getY());
+
+            pq.setX(srcLines.get(k).getEnd().centerX - srcLines.get(k).getStart().centerX);
+            pq.setY(srcLines.get(k).getEnd().centerY - srcLines.get(k).getStart().centerY);
+//            Log.i("P1Q1", pq.getX()+","+pq.getY());
+
+            interLen = pq.getX() * pq.getX() + pq.getY() * pq.getY();
+            interLenAbs = Math.sqrt(interLen);
+//            Log.i("|P1Q1|", interLenAbs+"");
+
+            norm.setX(pq.getY()*-1);
+            norm.setY(pq.getX());
+            normAbs = Math.sqrt(norm.getX()*norm.getX()+norm.getY()*norm.getY());
+//            Log.i("Nrm", norm.getX()+","+norm.getY());
+//            Log.i("NrmAbs", normAbs+"");
+
+//            Log.i("dotPRod", dotProd(pd,norm)+"");
+            d = dotProd(pd,norm)/normAbs;
+//            Log.i("d", d+"");
+            flen = (dp.getX() * pq.getX() + dp.getY() * pq.getY()) / interLenAbs;
+//            Log.i("flen", flen+"");
+
+            f = (flen/interLenAbs);
+
+
+
+//            Log.i("SRC:","PART TWO");
+
+            pq.setX(interLines.get(k).getEnd().centerX - interLines.get(k).getStart().centerX);
+            pq.setY(interLines.get(k).getEnd().centerY - interLines.get(k).getStart().centerY);
+//            Log.i("P1Q1", pq.getX()+","+pq.getY());
+
+            norm = calcNorm(pq);
+//            Log.i("nrm", norm.getX()+","+norm.getY());
+
+            nrmonrm = calcNrmONrm(norm, calcVectorLen(norm));
+//            Log.i("TEST", calcVectorLen(norm)+"");
+//            Log.i("nrmonrm", nrmonrm.getX()+","+nrmonrm.getY());
+
+
+            X = interLines.get(k).getStart().centerX + (pq.getX()*f);
+//            Log.i("fpX", X+"");
+            Y = interLines.get(k).getStart().centerY + (pq.getY()*f);
+//            Log.i("fpY", Y+"");
+
+
+            X = X - (d*nrmonrm.getX());
+//            Log.i("srcX", X+"");
+            Y = Y - (d*nrmonrm.getY());
+//            Log.i("srcY", Y+"");
+//            src.setX(X);
+//            src.setY(Y);
+
+//            if (u < 0)
+//                dist = Math.sqrt(pd.getX() * pd.getX() + pd.getY() * pd.getY());
+//            else if (u > 1) {
+//                qd.setX(x - srcLines.get(k).getEnd().centerX);
+//                qd.setY(y - srcLines.get(k).getEnd().centerY);
+//                dist = Math.sqrt(qd.getX() * qd.getX() + qd.getY() * qd.getY());
+//            }else{
+//                dist = Math.abs(v);
+//            }
+
+            double wNum = Math.pow(interLen, p);
+            double wDenom = a + Math.abs(d);
+            weight = Math.pow((wNum / wDenom), b);
+            sum_x += (X - x) * weight;
+            sum_y += (Y - y) * weight;
+            weightSum += weight;
+//            Log.i("weight", weight+"");
+//            Log.i("deltaX", sum_x+"");
+//            Log.i("deltaY", sum_y+"");
+//            Log.i("weightsum", weightSum+"");
+        }
+        src.setX(x + (sum_x / weightSum));
+        src.setY(y + (sum_y / weightSum));
+//        Log.i("srcX",  src.getX()+"");
+//        Log.i("srcY", src.getY()+"");
+
+        return src;
+    }
+
+
+
+    public double dotProd(Vector2d a, Vector2d b){
+        return a.getX() * b.getX() + a.getY() * b.getY();
+    }
+
+    public Vector2d calcNorm(Vector2d slope){
+        Vector2d nrm = new Vector2d(slope.getY()*-1,slope.getX());
+        return nrm;
+    }
+
+    public Vector2d calcNrmONrm(Vector2d nrm, double len){
+        return new Vector2d(nrm.getX()/len,nrm.getY()/len);
+    }
+
+    public double calcVectorLen(Vector2d a){
+        return Math.sqrt(a.getX() * a.getX() + a.getY() * a.getY());
     }
 
     public void clearAll(android.view.View v){
         firstImg.clearLines();
         secondImg.clearLines();
     }
+
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
+
+
 }
