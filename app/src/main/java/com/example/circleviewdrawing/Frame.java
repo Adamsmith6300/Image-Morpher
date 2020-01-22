@@ -35,10 +35,29 @@ public class Frame {
     public Frame(Bitmap bmp, int numberOfLines,ArrayList<Line> lines) {
         this.bmp = bmp;
         this.newBmp = bmp.copy(Bitmap.Config.ARGB_8888, true);
-        this.lines = lines;
+        this.lines = new ArrayList<Line>();
     }
 
-    public void interpolateColour(Vector2d src, Vector2d dest, double t, Bitmap srcBmp, Bitmap dst){
+    public int interpolateColour(Vector2d src, Vector2d dest, double t, Bitmap srcBmp, Bitmap dstBmp){
+        int srcColor = srcBmp.getPixel((int)src.getX(),(int)src.getY());
+        int dstColor = dstBmp.getPixel((int)dest.getX(),(int)dest.getY());
+
+        int srcR = Color.red(srcColor);
+        int srcG = Color.green(srcColor);
+        int srcB = Color.blue(srcColor);
+
+        int dstR = Color.red(dstColor);
+        int dstG = Color.green(dstColor);
+        int dstB = Color.blue(dstColor);
+
+
+        int interR = (int)(srcR*(1-t)+ dstR*t);
+        int interG = (int)(srcG*(1-t)+ dstG*t);
+        int interB = (int)(srcB*(1-t)+ dstB*t);
+
+        int interColor = Color.rgb(interR,interG,interB);
+
+        return interColor;
 
     }
 

@@ -7,6 +7,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -40,9 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
         verifyStoragePermissions(this);
 
+        Bitmap cat = BitmapFactory.decodeResource(getResources(), R.drawable.ch);
+        Bitmap dog = BitmapFactory.decodeResource(getResources(), R.drawable.gb);
         firstImg = findViewById(R.id.firstImage);
+        firstImg.setmBitmap(cat);
         secondImg = findViewById(R.id.secondImage);
-
+        secondImg.setmBitmap(dog);
 //        Line srcL = new Line(new CircleArea(1,40,1), new CircleArea(5,1,1));
 //        Line dstL = new Line(new CircleArea(5,16,1), new CircleArea(1,20,1));
 //        Line srcL2 = new Line(new CircleArea(8,1,1), new CircleArea(40,40,1));
@@ -71,32 +75,39 @@ public class MainActivity extends AppCompatActivity {
         //create list of frames
         outputFrames = new ArrayList<Frame>(numberOfFrames);
 
+        Bitmap firstImgBmp = firstImg.getmBitmap();
+        Bitmap secondImgBmp = secondImg.getmBitmap();
         //setup lines for each frame
         for(int i = 0; i < numberOfFrames;++i){
 
-            Bitmap bmp = Bitmap.createBitmap(w, h, conf);
-//            TO REMOVE:
-            Bitmap firstImgBmp = firstImg.getmBitmap();
             Frame newFrame = new Frame(firstImgBmp,numberOfLines, firstImg.getlines());
-            Bitmap newbmp = Bitmap.createBitmap(w, h, conf);
 
+            Bitmap newBmp = Bitmap.createBitmap(w, h, conf);
             int [] pixels = new int[w * h];
             firstImgBmp.getPixels(pixels, 0, w, 0, 0, w, h);
 
+//            Bitmap rightBmp = Bitmap.createBitmap(w, h, conf);
+//            int [] rightPixels = new int[w * h];
+//            secondImgBmp.getPixels(rightPixels, 0, w, 0, 0, w, h);
+
             //calc each line by interpolation
-            //newFrame.genLines(firstImg, secondImg, numberOfLines, numberOfFrames, i);
+            newFrame.genLines(firstImg, secondImg, numberOfLines, numberOfFrames, i);
             Vector2d src = new Vector2d(), dest = new Vector2d();
 
-            Log.i("srcLines",newFrame.getLines().toString());
-            Log.i("dstLines",dstLines.toString());
+//            Log.i("srcLines",srcLines.toString());
+//            Log.i("interLines",newFrame.getLines().toString());
+//            Log.i("dstLines",dstLines.toString());
+
+//            double t = (i+1.0)/(numberOfFrames+1.0);
+//            Log.i("T:",t+"");
 
             //calc position of each new pixel
             for(int x = 0; x < w; ++x){
                 for(int y = 0; y < h;++y){
 
                     double p = 0,a = 0.01f,b = 2.0f;
-                    src = warp(x,y, newFrame.getLines(), dstLines, p, a, b, src);
-                    //dest = warp(x,y, newFrame.getLines(), dstLines, p, a, b, dest);
+                    src = warp(x,y, newFrame.getLines(), srcLines, p, a, b, src);
+                    dest = warp(x,y, newFrame.getLines(), dstLines, p, a, b, dest);
 
                     if (src.getX() < 0)
                         src.setX(0);
@@ -106,40 +117,32 @@ public class MainActivity extends AppCompatActivity {
                         src.setY(0);
                     if (src.getY() > h-1)
                         src.setY(h - 1);
-//                    if (dest.getX() < 0)
-//                        dest.setX(0);
-//                    if (dest.getX() > w-1)
-//                        dest.setX(w - 1);
-//                    if (dest.getY() < 0)
-//                        dest.setY(0);
-//                    if (dest.getY() > h-1)
-//                        dest.setY(h-1);
+                    if (dest.getX() < 0)
+                        dest.setX(0);
+                    if (dest.getX() > w-1)
+                        dest.setX(w - 1);
+                    if (dest.getY() < 0)
+                        dest.setY(0);
+                    if (dest.getY() > h-1)
+                        dest.setY(h-1);
 
-                    //all blue working
-                    //pixels[(w*y)+x] = firstImgBmp.getPixel((int)src.getX(),(int)src.getY());
-                    pixels[(w*y)+x] = firstImgBmp.getPixel((int)src.getX(),(int)src.getY());
-
-                    //Log.i("src",src.getX()+"--"+src.getY());
-
-
-                    //newFrame.movePixel(x,y,src);
-                    //newFrame.interpolateColour(src, dest, (i+1)/(numberOfFrames+1), firstImg.getmBitmap(), secondImg.getmBitmap());
+                    pixels[(w*y)+x] = newFrame.interpolateColour(src, dest, (i+1.0)/(numberOfFrames+1.0), firstImgBmp, secondImgBmp);
 
                 }
             }
-            newbmp.setPixels(pixels, 0, w, 0, 0, w, h);
-            secondImg.setmBitmap(newbmp);
+            newBmp.setPixels(pixels, 0, w, 0, 0, w, h);
+            secondImg.setmBitmap(newBmp);
+            //outputFrames.add(newFrame);
 
             try {
                 String path =  Environment.getExternalStorageDirectory().getAbsolutePath();
                 OutputStream fOut = null;
-                Integer counter = 5;
                 Log.i("OUTPUT", path);
-                File file = new File(path, "cat"+i+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+                File file = new File(path, "midMorph"+i+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
                 fOut = new FileOutputStream(file);
 
                 //Bitmap pictureBitmap = newFrame.getNewBmp().copy(Bitmap.Config.ARGB_8888, true); // obtaining the Bitmap
-                newbmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+                newBmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
                 fOut.flush(); // Not really required
                 fOut.close(); // do not forget to close the stream
 
@@ -151,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-//            secondImg.setmBitmap(newFrame.getBmp());
-//            outputFrames.add(newFrame);
         }
 
     }
