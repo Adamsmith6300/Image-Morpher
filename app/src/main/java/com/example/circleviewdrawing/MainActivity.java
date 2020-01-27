@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private CirclesDrawingView firstImg;
     private CirclesDrawingView secondImg;
 
-    private int numberOfFrames = 1;
+    private int numberOfFrames = 5;
     private ArrayList<Frame> outputFrames;
 
     @Override
@@ -41,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
         verifyStoragePermissions(this);
 
-        Bitmap cat = BitmapFactory.decodeResource(getResources(), R.drawable.ch);
-        Bitmap dog = BitmapFactory.decodeResource(getResources(), R.drawable.gb);
+        Bitmap cat = BitmapFactory.decodeResource(getResources(), R.drawable.trump);
+        Bitmap dog = BitmapFactory.decodeResource(getResources(), R.drawable.monkey);
         firstImg = findViewById(R.id.firstImage);
         firstImg.setmBitmap(cat);
         secondImg = findViewById(R.id.secondImage);
@@ -65,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void beginMorph(android.view.View view){
+//        EditText numberOfFramesText   = (EditText)findViewById(R.id.editText);
+//        if (!"".equals(numberOfFramesText)){
+//            numberOfFrames=Integer.parseInt(numberOfFramesText.getText().toString());
+//        }
         int w = secondImg.getmBitmap().getWidth();
         int h = secondImg.getmBitmap().getHeight();
         ArrayList<Line> srcLines = firstImg.getlines();
@@ -78,83 +84,83 @@ public class MainActivity extends AppCompatActivity {
         Bitmap firstImgBmp = firstImg.getmBitmap();
         Bitmap secondImgBmp = secondImg.getmBitmap();
         //setup lines for each frame
-        for(int i = 0; i < numberOfFrames;++i){
-
-            Frame newFrame = new Frame(firstImgBmp,numberOfLines, firstImg.getlines());
-
-            Bitmap newBmp = Bitmap.createBitmap(w, h, conf);
-            int [] pixels = new int[w * h];
-            firstImgBmp.getPixels(pixels, 0, w, 0, 0, w, h);
-
-//            Bitmap rightBmp = Bitmap.createBitmap(w, h, conf);
-//            int [] rightPixels = new int[w * h];
-//            secondImgBmp.getPixels(rightPixels, 0, w, 0, 0, w, h);
-
-            //calc each line by interpolation
-            newFrame.genLines(firstImg, secondImg, numberOfLines, numberOfFrames, i);
-            Vector2d src = new Vector2d(), dest = new Vector2d();
-
-//            Log.i("srcLines",srcLines.toString());
-//            Log.i("interLines",newFrame.getLines().toString());
-//            Log.i("dstLines",dstLines.toString());
-
-//            double t = (i+1.0)/(numberOfFrames+1.0);
-//            Log.i("T:",t+"");
-
-            //calc position of each new pixel
-            for(int x = 0; x < w; ++x){
-                for(int y = 0; y < h;++y){
-
-                    double p = 0,a = 0.01f,b = 2.0f;
-                    src = warp(x,y, newFrame.getLines(), srcLines, p, a, b, src);
-                    dest = warp(x,y, newFrame.getLines(), dstLines, p, a, b, dest);
-
-                    if (src.getX() < 0)
-                        src.setX(0);
-                    if (src.getX() > w-1)
-                        src.setX(w - 1);
-                    if (src.getY() < 0)
-                        src.setY(0);
-                    if (src.getY() > h-1)
-                        src.setY(h - 1);
-                    if (dest.getX() < 0)
-                        dest.setX(0);
-                    if (dest.getX() > w-1)
-                        dest.setX(w - 1);
-                    if (dest.getY() < 0)
-                        dest.setY(0);
-                    if (dest.getY() > h-1)
-                        dest.setY(h-1);
-
-                    pixels[(w*y)+x] = newFrame.interpolateColour(src, dest, (i+1.0)/(numberOfFrames+1.0), firstImgBmp, secondImgBmp);
-
-                }
-            }
-            newBmp.setPixels(pixels, 0, w, 0, 0, w, h);
-            secondImg.setmBitmap(newBmp);
-            //outputFrames.add(newFrame);
-
-            try {
-                String path =  Environment.getExternalStorageDirectory().getAbsolutePath();
-                OutputStream fOut = null;
-                Log.i("OUTPUT", path);
-                File file = new File(path, "midMorph"+i+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
-                fOut = new FileOutputStream(file);
-
-                //Bitmap pictureBitmap = newFrame.getNewBmp().copy(Bitmap.Config.ARGB_8888, true); // obtaining the Bitmap
-                newBmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
-                fOut.flush(); // Not really required
-                fOut.close(); // do not forget to close the stream
-
-                MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-
-        }
+//        for(int i = 0; i < numberOfFrames;++i){
+//            Log.i("frame",i+"");
+//            Frame newFrame = new Frame(firstImgBmp,numberOfLines, firstImg.getlines());
+//
+//            Bitmap newBmp = Bitmap.createBitmap(w, h, conf);
+//            int [] pixels = new int[w * h];
+//            firstImgBmp.getPixels(pixels, 0, w, 0, 0, w, h);
+//
+////            Bitmap rightBmp = Bitmap.createBitmap(w, h, conf);
+////            int [] rightPixels = new int[w * h];
+////            secondImgBmp.getPixels(rightPixels, 0, w, 0, 0, w, h);
+//
+//            //calc each line by interpolation
+//            newFrame.genLines(firstImg, secondImg, numberOfLines, numberOfFrames, i);
+//            Vector2d src = new Vector2d(), dest = new Vector2d();
+//
+////            Log.i("srcLines",srcLines.toString());
+////            Log.i("interLines",newFrame.getLines().toString());
+////            Log.i("dstLines",dstLines.toString());
+//
+////            double t = (i+1.0)/(numberOfFrames+1.0);
+////            Log.i("T:",t+"");
+//
+//            //calc position of each new pixel
+//            for(int x = 0; x < w; ++x){
+//                for(int y = 0; y < h;++y){
+//
+//                    double p = 0,a = 0.01f,b = 2.0f;
+//                    src = warp(x,y, srcLines, newFrame.getLines(), p, a, b, src);
+//                    dest = warp(x,y, dstLines, newFrame.getLines(), p, a, b, dest);
+//
+//                    if (src.getX() < 0)
+//                        src.setX(0);
+//                    if (src.getX() > w-1)
+//                        src.setX(w - 1);
+//                    if (src.getY() < 0)
+//                        src.setY(0);
+//                    if (src.getY() > h-1)
+//                        src.setY(h - 1);
+//                    if (dest.getX() < 0)
+//                        dest.setX(0);
+//                    if (dest.getX() > w-1)
+//                        dest.setX(w - 1);
+//                    if (dest.getY() < 0)
+//                        dest.setY(0);
+//                    if (dest.getY() > h-1)
+//                        dest.setY(h-1);
+//
+////                    pixels[(w*y)+x] = firstImgBmp.getPixel((int)src.getX(),(int)src.getY());
+//                    pixels[(w*y)+x] = newFrame.interpolateColour(src, dest, (i+1.0)/(numberOfFrames+1.0), firstImgBmp, secondImgBmp);
+//
+//                }
+//            }
+//            newBmp.setPixels(pixels, 0, w, 0, 0, w, h);
+//            //secondImg.setmBitmap(newBmp);
+//            //outputFrames.add(newFrame);
+//
+//            try {
+//                String path =  Environment.getExternalStorageDirectory().getAbsolutePath();
+//                OutputStream fOut = null;
+//                Log.i("OUTPUT", path);
+//                File file = new File(path, "gbch"+i+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+//                fOut = new FileOutputStream(file);
+//
+//                //Bitmap pictureBitmap = newFrame.getNewBmp().copy(Bitmap.Config.ARGB_8888, true); // obtaining the Bitmap
+//                newBmp.compress(Bitmap.CompressFormat.JPEG, 100, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+//                fOut.flush(); // Not really required
+//                fOut.close(); // do not forget to close the stream
+//
+//                MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        Intent i = new Intent(MainActivity.this,SlideshowActivity.class);
+//        i.putParcelableArrayListExtra("frames", outputFrames);
+        startActivity(i);
 
     }
 
@@ -232,15 +238,23 @@ public class MainActivity extends AppCompatActivity {
 //            src.setX(X);
 //            src.setY(Y);
 
-//            if (u < 0)
-//                dist = Math.sqrt(pd.getX() * pd.getX() + pd.getY() * pd.getY());
-//            else if (u > 1) {
-//                qd.setX(x - srcLines.get(k).getEnd().centerX);
-//                qd.setY(y - srcLines.get(k).getEnd().centerY);
-//                dist = Math.sqrt(qd.getX() * qd.getX() + qd.getY() * qd.getY());
-//            }else{
-//                dist = Math.abs(v);
-//            }
+            //get percent along line
+            //if f < 0
+            //  return d = distP1
+            //if f > 1
+            //  return d = distP2
+            //else
+            //  return dist to line
+            if(f < 0){
+                qd.setX(srcLines.get(k).getStart().centerX);
+                qd.setY(srcLines.get(k).getStart().centerY);
+                d = distanceBetweenPts(new Vector2d(x,y), qd);
+            }
+            if(f > 1){
+                qd.setX(srcLines.get(k).getEnd().centerX);
+                qd.setY(srcLines.get(k).getEnd().centerY);
+                d = distanceBetweenPts(new Vector2d(x,y), qd);
+            }
 
             double wNum = Math.pow(interLen, p);
             double wDenom = a + Math.abs(d);
@@ -262,6 +276,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public double distanceBetweenPts(Vector2d pt, Vector2d linept){
+        double x = Math.pow((pt.getX() - linept.getX()),2);
+        double y = Math.pow((pt.getY() - linept.getY()),2);
+        return Math.sqrt(x+y);
+    }
 
     public double dotProd(Vector2d a, Vector2d b){
         return a.getX() * b.getX() + a.getY() * b.getY();

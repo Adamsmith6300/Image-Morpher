@@ -2,6 +2,8 @@ package com.example.circleviewdrawing;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -31,6 +33,7 @@ public class Frame {
     private Bitmap newBmp;
 
     private ArrayList<Line> lines;
+
 
     public Frame(Bitmap bmp, int numberOfLines,ArrayList<Line> lines) {
         this.bmp = bmp;
