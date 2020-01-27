@@ -1,12 +1,18 @@
 package com.example.imagemorpher;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
@@ -23,7 +29,7 @@ public class CirclesDrawingView extends View {
 
     /** Main bitmap */
     private Bitmap mBitmap = null;
-
+    private boolean imageLoaded = false;
     private Rect mMeasuredRect;
 
     /** Paint to draw circles */
@@ -158,6 +164,9 @@ public class CirclesDrawingView extends View {
 
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
+        if(!imageLoaded){
+            return super.onTouchEvent(event);
+        }
         boolean handled = false;
 
         CircleArea touchedCircle;
@@ -342,6 +351,14 @@ public class CirclesDrawingView extends View {
         }
 
         return touched;
+    }
+
+    public boolean isImageLoaded() {
+        return imageLoaded;
+    }
+
+    public void setImageLoaded(boolean imageLoaded) {
+        this.imageLoaded = imageLoaded;
     }
 
     @Override

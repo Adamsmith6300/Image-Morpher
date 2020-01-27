@@ -1,5 +1,6 @@
 package com.example.imagemorpher;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -17,23 +18,27 @@ import java.util.ArrayList;
 public class SlideshowActivity extends AppCompatActivity {
 
     private int index = 0;
-    private int totalFrames = 20;
+    private int totalFrames = 10;
     private SeekBar seekbar;
     private ArrayList<String> paths;
     private ArrayList<Bitmap> images;
     private ImageView slides;
+    private String imageName;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slideshow);
+        setTitle("Image Morpher - Results");
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         configureBackButton();
-
+        Intent i = getIntent();
+        imageName = i.getStringExtra("imageName");
+        totalFrames = i.getIntExtra("numberOfFrames", 5);
 
         images = new ArrayList<Bitmap>();
-        setBitmaps("/storage/emulated/0/trump", totalFrames);
+        setBitmaps("/storage/emulated/0/"+imageName, totalFrames);
         slides = findViewById(R.id.slides);
         slides.setImageBitmap(images.get(0));
 
