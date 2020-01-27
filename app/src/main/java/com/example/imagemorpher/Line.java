@@ -1,4 +1,4 @@
-package com.example.circleviewdrawing;
+package com.example.imagemorpher;
 
 public class Line {
 

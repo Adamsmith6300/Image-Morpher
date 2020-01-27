@@ -1,4 +1,4 @@
-package com.example.circleviewdrawing;
+package com.example.imagemorpher;
 
 import android.content.Context;
 

@@ -1,11 +1,8 @@
-package com.example.circleviewdrawing;
+package com.example.imagemorpher;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
-import android.util.SparseArray;
 
 import java.util.ArrayList;
 

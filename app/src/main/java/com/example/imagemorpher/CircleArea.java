@@ -1,4 +1,4 @@
-package com.example.circleviewdrawing;
+package com.example.imagemorpher;
 
 /** Stores data about single circle */
 public class CircleArea {

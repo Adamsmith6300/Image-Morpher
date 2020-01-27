@@ -5,7 +5,7 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context=".MainActivity">
-    <com.example.circleviewdrawing.CirclesDrawingView
+    <com.example.imagemorpher.CirclesDrawingView
         android:id="@+id/firstImage"
         android:layout_width="267dp"
         android:layout_height="221dp"
@@ -18,7 +18,7 @@ tools:context=".MainActivity">
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.circleviewdrawing.CirclesDrawingView
+    <com.example.imagemorpher.CirclesDrawingView
         android:id="@+id/secondImage"
         android:layout_width="244dp"
         android:layout_height="222dp"
