@@ -1,18 +1,12 @@
 package com.example.imagemorpher;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
@@ -38,7 +32,7 @@ public class CirclesDrawingView extends View {
 
     private final Random mRadiusGenerator = new Random();
     // Radius limit in pixels
-    private final static int RADIUS_LIMIT = 20;
+    private final static int RADIUS_LIMIT = 50;
 
     private static final int CIRCLES_LIMIT = 10;
 
@@ -149,17 +143,6 @@ public class CirclesDrawingView extends View {
             }
         }
 
-//        for (List<CircleArea> circleList : lines){
-//            CircleArea c1 = circleList.get(0);
-//            if(circleList.size() == 1 && c1.centerX == lastTouched.centerX){
-//
-//            } else {
-//                CircleArea c2 = circleList.get(1);
-//                if(c1.centerX == lastTouched.centerX || c2.centerX == lastTouched.centerX){
-//
-//                }
-//            }
-//        }
     }
 
     @Override

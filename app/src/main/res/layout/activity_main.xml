@@ -5,97 +5,82 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context=".MainActivity">
-    <com.example.imagemorpher.CirclesDrawingView
-        android:id="@+id/firstImage"
-        android:layout_width="267dp"
-        android:layout_height="221dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
-        android:layout_marginTop="95dp"
-        android:layout_marginBottom="95dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/secondImage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.imagemorpher.CirclesDrawingView
-        android:id="@+id/secondImage"
-        android:layout_width="244dp"
-        android:layout_height="222dp"
-        android:layout_marginTop="94dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="95dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/clearLinesBtn"
-        app:layout_constraintStart_toEndOf="@+id/firstImage"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-
-    <Button
-        android:id="@+id/clearLinesBtn"
-        android:layout_width="144dp"
-        android:layout_height="53dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="44dp"
-        android:layout_marginRight="44dp"
-        android:layout_marginBottom="10dp"
-        android:onClick="clearAll"
-        android:text="Clear Lines"
-        app:layout_constraintBottom_toTopOf="@+id/editText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageName" />
-
-    <Button
-        android:id="@+id/MorphBtn"
-        android:layout_width="144dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginEnd="44dp"
-        android:layout_marginRight="44dp"
-        android:layout_marginBottom="76dp"
-        android:onClick="beginMorph"
-        android:text="Morph"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/secondImage"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="144dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="43dp"
-        android:layout_marginRight="43dp"
-        android:layout_marginBottom="2dp"
-        android:ems="10"
-        android:inputType="numberSigned"
-        android:text="10"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintBottom_toTopOf="@+id/MorphBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/secondImage"
-        app:layout_constraintTop_toBottomOf="@+id/clearLinesBtn" />
+        <com.example.imagemorpher.CirclesDrawingView
+            android:id="@+id/firstImage"
+            android:layout_width="300dp"
+            android:layout_height="280dp"
+            android:layout_margin="5dp" />
 
-    <EditText
-        android:id="@+id/imageName"
-        android:layout_width="144dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginLeft="52dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="92dp"
-        android:layout_marginRight="92dp"
-        android:paddingLeft="10px"
-        android:text="imageName"
-        app:layout_constraintBottom_toTopOf="@+id/clearLinesBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.411"
-        app:layout_constraintStart_toEndOf="@+id/secondImage"
-        app:layout_constraintTop_toTopOf="parent" />
+        <com.example.imagemorpher.CirclesDrawingView
+            android:id="@+id/secondImage"
+            android:layout_width="300dp"
+            android:layout_height="280dp"
+            android:layout_margin="5dp" />
+
+
+        <LinearLayout
+            android:layout_width="143dp"
+            android:layout_height="394dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="1dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/openProject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Open" />
+
+            <EditText
+                android:id="@+id/imageName"
+                android:layout_width="144dp"
+                android:layout_height="45dp"
+                android:paddingLeft="10px"
+                android:text="imageName" />
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="144dp"
+                android:layout_height="45dp"
+                android:ems="10"
+                android:inputType="numberSigned"
+                android:text="10"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ThreadTest" />
+
+            <Button
+                android:id="@+id/MorphBtn"
+                android:layout_width="144dp"
+                android:layout_height="48dp"
+                android:onClick="beginMorph"
+                android:text="Morph" />
+
+            <Button
+                android:id="@+id/clearLinesBtn"
+                android:layout_width="144dp"
+                android:layout_height="53dp"
+                android:onClick="clearAll"
+                android:text="Clear Lines" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

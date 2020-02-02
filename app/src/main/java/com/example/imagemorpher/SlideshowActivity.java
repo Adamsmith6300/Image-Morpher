@@ -9,10 +9,15 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class SlideshowActivity extends AppCompatActivity {
@@ -24,26 +29,30 @@ public class SlideshowActivity extends AppCompatActivity {
     private ArrayList<Bitmap> images;
     private ImageView slides;
     private String imageName;
+    private String time;
+    private static DecimalFormat df = new DecimalFormat("#.###");
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slideshow);
-        setTitle("Image Morpher - Results");
+
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         configureBackButton();
         Intent i = getIntent();
         imageName = i.getStringExtra("imageName");
         totalFrames = i.getIntExtra("numberOfFrames", 5);
+        time = df.format(i.getDoubleExtra("time", 0.0));
 
-        images = new ArrayList<Bitmap>();
+        setTitle("Image Morpher - Results: " + time + "x faster than 1 thread");
+        images = new ArrayList<Bitmap>(totalFrames);
         setBitmaps("/storage/emulated/0/"+imageName, totalFrames);
         slides = findViewById(R.id.slides);
         slides.setImageBitmap(images.get(0));
 
         seekbar = (SeekBar) findViewById(R.id.seekBar2);
-        seekbar.setMax(totalFrames - 1);
+        seekbar.setMax(totalFrames + 1);
 
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -63,13 +72,35 @@ public class SlideshowActivity extends AppCompatActivity {
             }
         });
 
+        Button saveBtn = findViewById(R.id.saveResults);
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveProject();
+            }
+        });
+
 
 
     }
 
+    private void saveProject(){
+        try {
+            FileOutputStream fout = openFileOutput("savedProjects.txt", MODE_APPEND);
+            fout.write((imageName+" ").getBytes());
+            fout.write(Integer.toString(totalFrames).getBytes());
+            fout.write("\n".getBytes());
+            Toast.makeText(getApplicationContext(), "Project Saved", Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
 
     private void setBitmaps(String pathname, int numberOfFrames){
-        for(int i = 0; i < numberOfFrames; i++){
+        for(int i = 0; i < numberOfFrames+2; i++){
             File imgFile = new File(pathname+i+".jpg");
             if(imgFile.exists()){
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());

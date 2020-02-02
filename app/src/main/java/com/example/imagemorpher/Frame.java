@@ -61,22 +61,6 @@ public class Frame {
 
     }
 
-    public void movePixel(int x, int y, Vector2d src){
-        int c = this.bmp.getPixel(x,y);
-//        Log.i("PixelVal:",c+"");
-//        Log.i("X:",x+"");
-//        Log.i("Y:",y+"");
-//        Log.i("srcX:",src.getX()+"");
-//        Log.i("srcY:",src.getY()+"");
-        try {
-            this.newBmp.setPixel((int) src.getX(), (int) src.getY(), c);
-        } catch(IllegalStateException e){
-            Log.e("illegalState",e.getMessage());
-        }catch(IllegalArgumentException e){
-            Log.e("illegalArgument",e.getMessage());
-        }
-    }
-
     public void genLines(CirclesDrawingView firstImg, CirclesDrawingView secondImg, int numberOfLines, int numberOfFrames,int frameIndex){
 
         for(int j = 0; j < numberOfLines;++j){
@@ -103,9 +87,6 @@ public class Frame {
 
             //make vector
             Line newLine = new Line(start, end);
-//                Log.i("src:","\n"+srcLine.toString());
-//                Log.i("dst:",dstLine.toString());
-//                Log.i("intermediate:",newLine.toString());
             //add vector to frame class lines
             this.addLine(newLine);
         }

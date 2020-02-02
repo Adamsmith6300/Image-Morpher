@@ -6,55 +6,66 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="26dp"
-        android:layout_marginLeft="26dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="298dp"
-        android:layout_marginRight="298dp"
-        android:text="Back"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.125"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/slides"
-        android:layout_width="401dp"
-        android:layout_height="253dp"
-        android:layout_marginStart="11dp"
-        android:layout_marginLeft="11dp"
-        android:layout_marginTop="79dp"
-        android:layout_marginEnd="165dp"
-        android:layout_marginRight="165dp"
-        android:layout_marginBottom="79dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/backButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/cat" />
-
     <SeekBar
         android:id="@+id/seekBar2"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="449dp"
         android:layout_height="31dp"
-        android:layout_marginStart="181dp"
-        android:layout_marginLeft="181dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="152dp"
-        android:layout_marginRight="152dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginStart="141dp"
+        android:layout_marginLeft="141dp"
+        android:layout_marginEnd="141dp"
+        android:layout_marginRight="141dp"
+        android:layout_marginBottom="39dp"
         android:max="20"
         android:progress="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.784"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/slides"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/slides" />
+
+    <ImageView
+        android:id="@+id/slides"
+        android:layout_width="401dp"
+        android:layout_height="253dp"
+        android:layout_marginStart="165dp"
+        android:layout_marginLeft="165dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="165dp"
+        android:layout_marginRight="165dp"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/saveResults"
+        app:srcCompat="@drawable/cat" />
+
+    <Button
+        android:id="@+id/saveResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="31dp"
+        android:layout_marginEnd="165dp"
+        android:layout_marginRight="165dp"
+        android:layout_marginBottom="9dp"
+        android:text="Save"
+        app:layout_constraintBottom_toTopOf="@+id/slides"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/backButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="165dp"
+        android:layout_marginLeft="165dp"
+        android:layout_marginTop="31dp"
+        android:layout_marginEnd="225dp"
+        android:layout_marginRight="225dp"
+        android:layout_marginBottom="9dp"
+        android:text="Back"
+        app:layout_constraintBottom_toTopOf="@+id/slides"
+        app:layout_constraintEnd_toStartOf="@+id/saveResults"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
