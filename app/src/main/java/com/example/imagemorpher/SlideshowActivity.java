@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,6 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SlideshowActivity extends AppCompatActivity {
 
@@ -31,6 +35,7 @@ public class SlideshowActivity extends AppCompatActivity {
     private String imageName;
     private String time;
     private static DecimalFormat df = new DecimalFormat("#.###");
+    private ScheduledExecutorService scheduler;
 
 
     @Override
@@ -80,9 +85,42 @@ public class SlideshowActivity extends AppCompatActivity {
             }
         });
 
+        Button playBtn = findViewById(R.id.playBtn);
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playAnimation();
+            }
+        });
+
+        Button stopBtn = findViewById(R.id.stopBtn);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scheduler.shutdown();
+            }
+        });
 
 
     }
+
+    private void playAnimation(){
+        scheduler =
+                Executors.newSingleThreadScheduledExecutor();
+
+        scheduler.scheduleAtFixedRate
+                (new Runnable() {
+                    public void run() {
+                        index++;
+                        if(index <= images.size()){
+                            seekbar.setProgress(index);
+                        } else {
+                            index = 0;
+                        }
+                    }
+                }, 0, 70, TimeUnit.MILLISECONDS);
+    }
+
 
     private void saveProject(){
         try {

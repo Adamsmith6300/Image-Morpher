@@ -146,15 +146,19 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private class MorpherThread implements  Runnable {
 
-        private int i;
+        private int stIndex;
+        private int endIndex;
 
-        public MorpherThread(int index){
-            this.i = index;
+        public MorpherThread(int stIndex, int endIndex){
+            this.stIndex = stIndex;
+            this.endIndex = endIndex;
         }
 
         @Override
         public void run() {
-            createFrame(i);
+            for(int i = stIndex; i < endIndex; ++i){
+                createFrame(i);
+            }
         }
     }
 
@@ -181,11 +185,19 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         ArrayList<Thread> morphThreads = new ArrayList<>();
 
         startTime = System.nanoTime();
-        for(int i = 0; i < numberOfFrames;++i){
-            Thread frameThread = new Thread(new MorpherThread(i));
-            frameThread.start();
-            morphThreads.add(frameThread);
-        }
+        Thread frameThread0 = new Thread(new MorpherThread(0, (int)(numberOfFrames/4)));
+        frameThread0.start();
+        morphThreads.add(frameThread0);
+        Thread frameThread1 = new Thread(new MorpherThread((int)(numberOfFrames/4),2*(int)(numberOfFrames/4)));
+        frameThread1.start();
+        morphThreads.add(frameThread1);
+        Thread frameThread2 = new Thread(new MorpherThread(2*(int)(numberOfFrames/4),3*(int)(numberOfFrames/4)));
+        frameThread2.start();
+        morphThreads.add(frameThread2);
+        Thread frameThread3 = new Thread(new MorpherThread(3*(int)(numberOfFrames/4),numberOfFrames));
+        frameThread3.start();
+        morphThreads.add(frameThread3);
+
         for (Thread thread : morphThreads) {
             try {
                 thread.join();

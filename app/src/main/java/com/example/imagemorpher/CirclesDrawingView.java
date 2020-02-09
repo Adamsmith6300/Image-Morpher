@@ -32,7 +32,7 @@ public class CirclesDrawingView extends View {
 
     private final Random mRadiusGenerator = new Random();
     // Radius limit in pixels
-    private final static int RADIUS_LIMIT = 50;
+    private final static int RADIUS_LIMIT = 10;
 
     private static final int CIRCLES_LIMIT = 10;
 

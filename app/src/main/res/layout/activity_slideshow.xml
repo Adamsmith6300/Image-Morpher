@@ -42,14 +42,14 @@
         android:id="@+id/saveResults"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="31dp"
+        android:layout_marginTop="33dp"
         android:layout_marginEnd="165dp"
         android:layout_marginRight="165dp"
-        android:layout_marginBottom="9dp"
+        android:layout_marginBottom="5dp"
         android:text="Save"
         app:layout_constraintBottom_toTopOf="@+id/slides"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/backButton"
+        app:layout_constraintStart_toEndOf="@+id/stopBtn"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -59,13 +59,47 @@
         android:layout_marginStart="165dp"
         android:layout_marginLeft="165dp"
         android:layout_marginTop="31dp"
-        android:layout_marginEnd="225dp"
-        android:layout_marginRight="225dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         android:layout_marginBottom="9dp"
         android:text="Back"
         app:layout_constraintBottom_toTopOf="@+id/slides"
-        app:layout_constraintEnd_toStartOf="@+id/saveResults"
+        app:layout_constraintEnd_toStartOf="@+id/playBtn"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <Button
+        android:id="@+id/playBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="34dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="8dp"
+        android:text="Play"
+        app:layout_constraintBottom_toTopOf="@+id/slides"
+        app:layout_constraintEnd_toStartOf="@+id/stopBtn"
+        app:layout_constraintStart_toEndOf="@+id/backButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.333" />
+
+    <Button
+        android:id="@+id/stopBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="34dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginRight="22dp"
+        android:layout_marginBottom="8dp"
+        android:text="Stop"
+        app:layout_constraintBottom_toTopOf="@+id/slides"
+        app:layout_constraintEnd_toStartOf="@+id/saveResults"
+        app:layout_constraintStart_toEndOf="@+id/playBtn"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
